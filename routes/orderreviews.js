@@ -26,6 +26,35 @@ router.get('/orderreviews', async (req, res) => {
   }
 });
 
+
+// GET order reviews based on a keyword search
+router.get('/orderreviews/:search', async (req, res) => {
+  try {
+    const { search } = req.params; // Corrected the variable name to 'search'
+
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // Query to fetch order reviews that match the keyword in the burgerName
+    const query = 'SELECT * FROM OrderReviews WHERE burgerName LIKE ?';
+    
+    // Execute the query with '%' to allow partial matches
+    const [rows] = await connection.query(query, [`%${search}%`]);
+
+    // Release the connection
+    connection.release();
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving order reviews:', error.message);
+    res.status(500).json({ error: 'An error occurred while fetching order reviews' });
+  }
+});
+
+
+
+
+
 // GET order review by ReviewID with ingredient names as an array
 router.get('/orderreviews/:ReviewID', async (req, res) => {
   try {
